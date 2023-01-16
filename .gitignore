@@ -1,0 +1,13 @@
+# Created by https://www.gitignore.io/api/python,pycharm,vscode
+*.log
+*.pyc
+*.pyo
+*.egg-info
+*.egg
+
+# Environments
+venv/
+
+# VSCode
+.vscode/
+
