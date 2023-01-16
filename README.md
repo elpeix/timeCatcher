@@ -1,9 +1,8 @@
 # Time catcher
 
 
-
 ```
-usage: timecatcher.py [-h] [-c] [-m MESSAGE] [-t] [-l] [-f FILE]
+cli usage: python timecatchercli.py [-h] [-c] [-m MESSAGE] [-t] [-l] [-f FILE]
 
 Catch time
 
