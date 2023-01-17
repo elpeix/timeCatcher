@@ -1,12 +1,9 @@
-"""Catch time and write to file from cli"""
-
 import argparse
 import sys
-from timecatcher import TimeCatcher
+from src.timecatcher import TimeCatcher
 
 
 class TimeCatcherCli:
-    """Catch time and write to file from cli"""
 
     time_catcher: TimeCatcher
 
@@ -14,18 +11,12 @@ class TimeCatcherCli:
         self.time_catcher = TimeCatcher(file_name)
 
     def catch_time(self) -> None:
-        """Catch time getting message from input"""
-
         self.time_catcher.catch_time()
 
     def direct_catch(self, message) -> None:
-        """Catch time with message"""
-
         self.time_catcher.direct_catch(message)
 
     def count_time(self) -> str:
-        """Count time between entries"""
-
         time_entries = self.time_catcher.count_time()
         if not time_entries or not time_entries[0]:
             return "No log"
@@ -40,8 +31,6 @@ class TimeCatcherCli:
         return output
 
     def get_log(self) -> str:
-        """Get log from file"""
-
         entries = self.time_catcher.get_entries()
         if not entries:
             return "No log"
@@ -49,8 +38,6 @@ class TimeCatcherCli:
         return "\n".join(entries)
 
     def get_last_entry(self) -> str:
-        """Get last entry from file"""
-
         time_entry = self.time_catcher.get_last_entry()
         if not time_entry:
             return "No log"
