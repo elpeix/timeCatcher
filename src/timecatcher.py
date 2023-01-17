@@ -14,18 +14,19 @@ class TimeCatcher:
         else:
             self.file_name = file_name
 
-    def direct_catch(self, message: str) -> None:
-        self.__write_to_file(message)
-
-    def catch_time(self) -> None:
-        message = input("Message: ")
-        self.__write_to_file(message)
-
-    def __write_to_file(self, message=None) -> None:
+    def catch(self, message: str) -> None:
         if message is None or message == "":
             return
         with open(self.file_name, "a", encoding="utf-8") as file:
             file.write(f"{self.__get_time()} {message}\n")
+
+    def manual_catch(self, line:str) -> bool:
+        if not self.__line_is_entry(line):
+            return False
+        with open(self.file_name, "a", encoding="utf-8") as file:
+            file.write(f"{line}\n")
+        self.sanitize()
+        return True
 
     def __file_exists(self) -> bool:
         return os.path.isfile(self.file_name)
@@ -63,7 +64,7 @@ class TimeCatcher:
         entries = self.get_entries()
         if len(entries) == 0:
             return []
-        
+
         time_counter = TimeCounter()
         time_counter.add_entry(entries[-1])
         time_counter.add_entry(f"{self.__get_time()} End")
@@ -73,7 +74,20 @@ class TimeCatcher:
     def __line_is_entry(self, line: str) -> bool:
         line_validator = LineValidator(line)
         return line_validator.is_valid()
-    
+
+    def sanitize(self) -> None:
+        entries = self.get_entries()
+        if len(entries) == 0:
+            return
+
+        tmp_file_name = f"{self.file_name}.tmp"
+        with open(tmp_file_name, "w", encoding="utf-8") as file:
+            for entry in entries:
+                file.write(f"{entry}\n")
+
+        os.remove(self.file_name)
+        os.rename(tmp_file_name, self.file_name)
+
 
 class TimeCounter:
 
