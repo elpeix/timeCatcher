@@ -40,6 +40,7 @@ class TimeCatcher:
         if len(entries) == 0:
             return ()
 
+        entries.sort()
         time_counter = TimeCounter()
         for entry in entries:
             time_counter.add_entry(entry)
@@ -80,6 +81,7 @@ class TimeCatcher:
         if len(entries) == 0:
             return
 
+        entries.sort()
         tmp_file_name = f"{self.file_name}.tmp"
         with open(tmp_file_name, "w", encoding="utf-8") as file:
             for entry in entries:
