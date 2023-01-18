@@ -8,9 +8,7 @@ class TimeCatcher:
 
     def __init__(self, file_name: str = None):
         if file_name is None:
-            now = datetime.datetime.now()
-            str_date = now.strftime("%Y-%m-%d")
-            self.file_name = f"timeLog_{str_date}.log"
+            self.file_name = f"timeLog_{DateTimeGetter.get_date()}.log"
         else:
             self.file_name = file_name
 
@@ -18,7 +16,7 @@ class TimeCatcher:
         if message is None or message == "":
             return
         with open(self.file_name, "a", encoding="utf-8") as file:
-            file.write(f"{self.__get_time()} {message}\n")
+            file.write(f"{DateTimeGetter.get_time()} {message}\n")
 
     def manual_catch(self, line:str) -> bool:
         if not self.__line_is_entry(line):
@@ -31,23 +29,20 @@ class TimeCatcher:
     def __file_exists(self) -> bool:
         return os.path.isfile(self.file_name)
 
-    def __get_time(self) -> str:
-        now = datetime.datetime.now()
-        return now.strftime("%H:%M")
-
     def count_time(self) -> tuple:
         entries = self.get_entries()
         if len(entries) == 0:
             return ()
 
-        entries.sort()
         time_counter = TimeCounter()
         for entry in entries:
             time_counter.add_entry(entry)
 
-        time_counter.add_entry(f"{self.__get_time()} End")
         time_counter.count_time()
-        return (time_counter.get_time_entries(), time_counter.get_total_time())
+        return (
+            time_counter.get_time_entries(),
+            time_counter.get_total_time()
+        )
 
     def get_entries(self) -> list:
         if not self.__file_exists():
@@ -61,16 +56,18 @@ class TimeCatcher:
                     result.append(line[:-1])
         return result
 
-    def get_last_entry(self) -> list:
+    def get_last_entry(self) -> tuple:
         entries = self.get_entries()
         if len(entries) == 0:
-            return []
+            return ()
 
         time_counter = TimeCounter()
         time_counter.add_entry(entries[-1])
-        time_counter.add_entry(f"{self.__get_time()} End")
         time_counter.count_time()
-        return time_counter.get_time_entries()[-1]
+        time_entries = time_counter.get_time_entries()
+        if len(time_entries) == 0:
+            return ()
+        return time_entries[-1]
 
     def __line_is_entry(self, line: str) -> bool:
         line_validator = LineValidator(line)
@@ -94,7 +91,6 @@ class TimeCatcher:
 class TimeCounter:
 
     def __init__(self):
-        self.previous_entry = None
         self.entries = []
         self.time_entries = []
         self.total_time = 0
@@ -106,19 +102,31 @@ class TimeCounter:
         if len(self.entries) == 0:
             return
 
+        entries_copy = self.entries.copy()
+        entries_copy.sort()
+
+        if self.__is_valuable_entry(entries_copy[-1]):
+            entries_copy.append(f"{DateTimeGetter.get_time()} *End")
+
         self.time_entries = []
         self.total_time = 0
-        for entry in self.entries:
-            if self.previous_entry is None:
-                self.previous_entry = entry
+        previous_entry = None
+        for entry in entries_copy:
+            if previous_entry is None:
+                if self.__is_valuable_entry(entry):
+                    previous_entry = entry
                 continue
-            time = self.get_time(entry) - self.get_time(self.previous_entry)
+            
+            time = self.get_time(entry) - self.get_time(previous_entry)
             if time == 0:
                 continue
-            entry_message = " ".join(self.previous_entry.split(" ")[1:])
-            self.time_entries.append((time, entry_message))
+            message = self.__get_message(previous_entry)
+            self.time_entries.append((
+                time, 
+                self.__get_message(previous_entry)
+            ))
             self.total_time += time
-            self.previous_entry = entry
+            previous_entry = entry if self.__is_valuable_entry(entry) else None
 
     def get_time_entries(self) -> list:
         return self.time_entries
@@ -131,3 +139,22 @@ class TimeCounter:
         hour = int(time.split(":")[0])
         minute = int(time.split(":")[1])
         return hour * 60 + minute
+
+    def __get_message(self, entry: str) -> str:
+        return " ".join(entry.split(" ")[1:])
+    
+    def __is_valuable_entry(self, entry: str) -> bool:
+        return self.__get_message(entry)[0] != "*"
+
+
+class DateTimeGetter:
+
+    @staticmethod
+    def get_date() -> str:
+        now = datetime.datetime.now()
+        return now.strftime("%Y-%m-%d")
+
+    @staticmethod
+    def get_time() -> str:
+        now = datetime.datetime.now()
+        return now.strftime("%H:%M")

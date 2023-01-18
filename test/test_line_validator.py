@@ -40,6 +40,7 @@ class LineValidatorTest(unittest.TestCase):
             "12:00 Start ",
             "12:00  Start ",
             "12:00  Start with spaces",
+            "12:00 *Start",
         ]
         for valid_value in valid_values:
             line_validator = LineValidator(valid_value)
