@@ -1,6 +1,6 @@
 import unittest
 
-from src.line_validator import LineValidator
+from src.timecatcher import LineValidator
 
 
 class LineValidatorTest(unittest.TestCase):
@@ -31,8 +31,10 @@ class LineValidatorTest(unittest.TestCase):
         ]
         for wrong_value in wrong_values:
             line_validator = LineValidator(wrong_value)
-            self.assertFalse(line_validator.is_valid(), msg=f"Value [{wrong_value}] should not be valid")
-    
+            self.assertFalse(
+                line_validator.is_valid(),
+                msg=f"Value [{wrong_value}] should not be valid")
+
     def test_is_valid(self):
         valid_values = [
             "12:00 Start",
@@ -44,4 +46,6 @@ class LineValidatorTest(unittest.TestCase):
         ]
         for valid_value in valid_values:
             line_validator = LineValidator(valid_value)
-            self.assertTrue(line_validator.is_valid(), msg=f"Value [{valid_value}] should be valid")
+            self.assertTrue(
+                line_validator.is_valid(),
+                msg=f"Value [{valid_value}] should be valid")

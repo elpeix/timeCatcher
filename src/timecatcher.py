@@ -1,8 +1,6 @@
 import datetime
 import os
 
-from src.line_validator import LineValidator
-
 
 class TimeCatcher:
 
@@ -116,13 +114,12 @@ class TimeCounter:
                 if self.__is_valuable_entry(entry):
                     previous_entry = entry
                 continue
-            
+
             time = self.get_time(entry) - self.get_time(previous_entry)
             if time == 0:
                 continue
-            message = self.__get_message(previous_entry)
             self.time_entries.append((
-                time, 
+                time,
                 self.__get_message(previous_entry)
             ))
             self.total_time += time
@@ -142,7 +139,7 @@ class TimeCounter:
 
     def __get_message(self, entry: str) -> str:
         return " ".join(entry.split(" ")[1:])
-    
+
     def __is_valuable_entry(self, entry: str) -> bool:
         return self.__get_message(entry)[0] != "*"
 
@@ -158,3 +155,35 @@ class DateTimeGetter:
     def get_time() -> str:
         now = datetime.datetime.now()
         return now.strftime("%H:%M")
+
+
+class LineValidator:
+
+    def __init__(self, line):
+        self.line = line
+
+    def is_valid(self) -> bool:
+        if not self.__is_valid_line():
+            return False
+        split_line = self.line.split(" ")
+        if len(split_line) < 2 or not self.__has_valid_time(split_line[0]):
+            return False
+        message = " ".join(split_line[1:]).strip()
+        return len(message) > 0
+
+    def __is_valid_line(self) -> bool:
+        if not self.line or not isinstance(self.line, str):
+            return False
+        return True
+
+    def __has_valid_time(self, time_entry:str) -> bool:
+        if not time_entry or not isinstance(time_entry, str):
+            return False
+        if len(time_entry) != 5 or not time_entry.replace(":", "").isdigit():
+            return False
+        hour, minute = time_entry.split(":")
+        if int(hour) < 0 or int(hour) > 23:
+            return False
+        if int(minute) < 0 or int(minute) > 59:
+            return False
+        return True
