@@ -1,6 +1,6 @@
 import unittest
 
-from src.timecatcher import LineValidator
+from timecatcher import LineValidator
 
 
 class LineValidatorTest(unittest.TestCase):

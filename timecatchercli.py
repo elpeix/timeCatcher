@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import argparse
 import sys
-from src.timecatcher import TimeCatcher
+from timecatcher import TimeCatcher, VERSION
 
 
 class TimeCatcherCli:
@@ -68,6 +71,7 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--log", help="Print log", action="store_true")
     parser.add_argument("-f", "--file", help="File name")
     parser.add_argument("-s", "--sanitize", help="Sanitize log", action="store_true")
+    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {VERSION}")
     args = parser.parse_args()
 
     items = ['catch', 'add', 'total', 'print', 'log', 'file', 'sanitize']
