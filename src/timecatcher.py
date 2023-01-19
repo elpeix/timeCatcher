@@ -1,14 +1,55 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import datetime
 import os
+import configparser
 
 
 class TimeCatcher:
 
     def __init__(self, file_name: str = None):
+        self.__init_config()
         if file_name is None:
             self.file_name = f"timeLog_{DateTimeGetter.get_date()}.log"
         else:
             self.file_name = file_name
+        self.file_name = f"{self.log_path}/{self.file_name}"
+
+    def __init_config(self) -> None:
+        home_path = os.path.expanduser("~")
+        config_path = f"{home_path}/.config/timeCatcher"
+        config_file = f"{config_path}/config.ini"
+
+        config = configparser.ConfigParser()
+        config.read(config_file, encoding="utf-8")
+        if 'App' in config and 'time_log_path' in config['App']:
+            log_path = config['App']['time_log_path']
+            log_path = self.__parse_log_path(log_path)
+            if log_path:
+                self.log_path = log_path
+                return
+
+        log_path = f"{home_path}/.timeCatcher"
+        os.makedirs(log_path, exist_ok=True)
+
+        os.makedirs(config_path, exist_ok=True)
+        config['App'] = {'time_log_path': log_path}
+
+        with open(config_file, 'w', encoding="utf-8") as configfile:
+            config.write(configfile)
+
+        self.log_path = log_path
+
+    def __parse_log_path(self, log_path: str) -> str:
+        home_path = os.path.expanduser("~")
+        if log_path[-1] == "/":
+            log_path = log_path[:-1]
+        if log_path[0] == "~":
+            log_path = f"{home_path}{log_path[1:]}"
+        if os.path.isdir(log_path):
+            return log_path
+        return None
 
     def catch(self, message: str) -> None:
         if message is None or message == "":
